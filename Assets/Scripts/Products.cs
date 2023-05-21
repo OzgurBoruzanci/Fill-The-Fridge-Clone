@@ -8,27 +8,71 @@ public class Products : MonoBehaviour,IClickable
 {
     public float volume;
     public bool cliced = false;
+    public bool doubleSize = false;
+    public bool didSettle = false;
+    bool collided=true;
+    bool clickable = true;
+    Vector3 firstPosition;
+    Quaternion firstRotation;
     private void OnEnable()
     {
         EventManager.TargetPosition += TargetPosition;
+        //EventManager.DidNotSettle += DidNotSettle;
+        //EventManager.DidSettle += DidSettle;
     }
     private void OnDisable()
     {
         EventManager.TargetPosition -= TargetPosition;
+        //EventManager.DidNotSettle -= DidNotSettle;
+        //EventManager.DidSettle -= DidSettle;
     }
     void TargetPosition(Vector3 targetPosition,Quaternion rotation)
     {
         if (cliced)
         {
-            transform.DOMove(targetPosition, 0.5f);
-            transform.DORotateQuaternion(rotation, 0.5f);
+            transform.rotation = rotation;
+            transform.position = targetPosition;
+            //transform.DORotateQuaternion(rotation, 0.01f);
+            //transform.DOMove(targetPosition, 0.5f);
             cliced = false;
+            //transform.GetComponent<BoxCollider>().enabled = false;
         }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag=="Product" || other.tag=="Border") 
+        {
+            DidNotSettle();
+            Debug.Log(other.name);
+        }
+
+        if (other.tag != "Product" || other.tag != "Border")
+        {
+            if (collided)
+            {
+                DidSettle();
+                collided = false;
+            }
+        }
+    }
+    void DidSettle()
+    {
+        clickable = false;
+        EventManager.DidSettle(Mathf.Floor(volume));
+    }
+    void DidNotSettle()
+    {
+        transform.position = firstPosition;
+        transform.rotation = firstRotation;
+        clickable = true;
     }
 
     void Start()
     {
         CalculateVolume();
+        IsDoubleSize();
+        firstPosition=transform.position;
+        firstRotation = transform.rotation;
     }
 
     
@@ -36,17 +80,28 @@ public class Products : MonoBehaviour,IClickable
     {
         
     }
-    //private void OnMouseDown()
-    //{
-    //    OnClick();
-    //}
+
     void CalculateVolume()
     {
-        volume = transform.localScale.x*transform.localScale.y*transform.localScale.z;
+        volume = transform.GetComponent<BoxCollider>().size.x * 
+            transform.GetComponent<BoxCollider>().size.y * 
+            transform.GetComponent<BoxCollider>().size.z;
+
     }
 
     public void OnClick()
     {
-        cliced= true;
+        if (clickable)
+        {
+            cliced = true;
+            EventManager.ProductHeight(transform.GetComponent<BoxCollider>().size.y);
+        }
+    }
+    void IsDoubleSize()
+    {
+        if (transform.GetComponent<BoxCollider>().size.y>1)
+        {
+            doubleSize= true;
+        }
     }
 }

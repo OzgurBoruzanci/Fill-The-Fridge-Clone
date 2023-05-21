@@ -4,6 +4,28 @@ using UnityEngine;
 
 public class GameManagerController : MonoBehaviour
 {
+    public float hamperVolume;
+
+    private void OnEnable()
+    {
+        EventManager.HamperVolume += HamperVolume;
+        EventManager.DidSettle += DidSettle;
+    }
+    private void OnDisable()
+    {
+        EventManager.HamperVolume -= HamperVolume;
+        EventManager.DidSettle -= DidSettle;
+    }
+    void HamperVolume(float hVolume)
+    {
+        hamperVolume=hVolume;
+    }
+    void DidSettle(float didSettle) 
+    {
+        Debug.Log(didSettle);
+        hamperVolume -= didSettle;
+    }
+
     void Update()
     {
         IsItHealthy();
@@ -21,6 +43,7 @@ public class GameManagerController : MonoBehaviour
                 if (clickable != null)
                 {
                     clickable.OnClick();
+                    
                 }
             }
         }
@@ -28,7 +51,7 @@ public class GameManagerController : MonoBehaviour
 
     void IsItHealthy()
     {
-        if (1==1)
+        if (hamperVolume>=0)
         {
             MouseDown();
         }
