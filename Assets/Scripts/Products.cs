@@ -11,19 +11,19 @@ public class Products : MonoBehaviour,IClickable
     public bool doubleSize = false;
     public bool didSettle = false;
     bool collided=true;
-    bool clickable = true;
+    public bool clickable = true;
     Vector3 firstPosition;
     Quaternion firstRotation;
     private void OnEnable()
     {
         EventManager.TargetPosition += TargetPosition;
-        //EventManager.DidNotSettle += DidNotSettle;
+        EventManager.DidNotSettle += DidNotSettle;
         //EventManager.DidSettle += DidSettle;
     }
     private void OnDisable()
     {
         EventManager.TargetPosition -= TargetPosition;
-        //EventManager.DidNotSettle -= DidNotSettle;
+        EventManager.DidNotSettle -= DidNotSettle;
         //EventManager.DidSettle -= DidSettle;
     }
     void TargetPosition(Vector3 targetPosition,Quaternion rotation)
@@ -34,37 +34,49 @@ public class Products : MonoBehaviour,IClickable
             transform.position = targetPosition;
             //transform.DORotateQuaternion(rotation, 0.01f);
             //transform.DOMove(targetPosition, 0.5f);
+            clickable = false;
             cliced = false;
             //transform.GetComponent<BoxCollider>().enabled = false;
         }
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag=="Product" || other.tag=="Border") 
+        if (/*cliced &&*/!didSettle && other.GetComponent<Products>() || other.GetComponent<BorderManager>())
         {
-            DidNotSettle();
-            Debug.Log(other.name);
+            EventManager.DidNotSettle(Mathf.Floor(volume));
+            clickable = true;
+            Debug.Log("girdi"+other.name);
+        }
+        else if (!didSettle && other.transform.parent==null && !other.GetComponent<Products>() || !other.GetComponent<BorderManager>())
+        {
+            DidSettle();
+            didSettle=true;
+            Debug.Log(didSettle+other.name);
         }
 
-        if (other.tag != "Product" || other.tag != "Border")
-        {
-            if (collided)
-            {
-                DidSettle();
-                collided = false;
-            }
-        }
+
+        //if (other.tag != "Product" || other.tag != "Border")
+        //{
+        //    if (collided)
+        //    {
+        //        DidSettle();
+        //        collided = false;
+        //    }
+        //}
     }
     void DidSettle()
     {
         clickable = false;
         EventManager.DidSettle(Mathf.Floor(volume));
     }
-    void DidNotSettle()
+    void DidNotSettle(float pVolume)
     {
-        transform.position = firstPosition;
-        transform.rotation = firstRotation;
-        clickable = true;
+        if (clickable)
+        {
+            transform.position = firstPosition;
+            transform.rotation = firstRotation;
+            //clickable = true;
+        }
     }
 
     void Start()
@@ -95,6 +107,8 @@ public class Products : MonoBehaviour,IClickable
         {
             cliced = true;
             EventManager.ProductHeight(transform.GetComponent<BoxCollider>().size.y);
+            //DidSettle();
+            EventManager.DidSettle(Mathf.Floor(volume));
         }
     }
     void IsDoubleSize()

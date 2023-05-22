@@ -9,22 +9,22 @@ public class GameManagerController : MonoBehaviour
     private void OnEnable()
     {
         EventManager.HamperVolume += HamperVolume;
-        EventManager.DidSettle += DidSettle;
+        //EventManager.DidSettle += DidSettle;
     }
     private void OnDisable()
     {
         EventManager.HamperVolume -= HamperVolume;
-        EventManager.DidSettle -= DidSettle;
+        //EventManager.DidSettle -= DidSettle;
     }
     void HamperVolume(float hVolume)
     {
         hamperVolume=hVolume;
     }
-    void DidSettle(float didSettle) 
-    {
-        Debug.Log(didSettle);
-        hamperVolume -= didSettle;
-    }
+    //void DidSettle(float didSettle) 
+    //{
+    //    Debug.Log(didSettle);
+    //    hamperVolume -= didSettle;
+    //}
 
     void Update()
     {
@@ -51,7 +51,7 @@ public class GameManagerController : MonoBehaviour
 
     void IsItHealthy()
     {
-        if (hamperVolume>=0)
+        if (/*hamperVolume*/ 200>=0)
         {
             MouseDown();
         }
