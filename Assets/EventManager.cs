@@ -10,5 +10,4 @@ public static class EventManager
     public static Action<float> ProductHeight;
     public static Action<float> HamperVolume;
     public static Action<float> DidSettle;
-    public static Action<float> DidNotSettle;
 }
