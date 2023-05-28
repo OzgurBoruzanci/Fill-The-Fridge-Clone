@@ -22,7 +22,6 @@ public class GameManagerController : MonoBehaviour
     }
     void DidSettle(float didSettle) 
     {
-        Debug.Log(didSettle);
         hamperVolume -= didSettle;
     }
 

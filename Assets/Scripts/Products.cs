@@ -10,8 +10,9 @@ public class Products : MonoBehaviour,IClickable
     public bool cliced = false;
     public bool doubleSize = false;
     public bool didSettle = false;
-    bool collided=true;
-    bool clickable = true;
+    public bool didNotSettle=false;
+    public bool _collided=true;
+    public bool _clickable = true;
     Vector3 firstPosition;
     Quaternion firstRotation;
     private void OnEnable()
@@ -40,31 +41,48 @@ public class Products : MonoBehaviour,IClickable
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag=="Product" || other.tag=="Border") 
+        if (other.GetComponent<Products>() || other.GetComponent<BorderManager>()) 
         {
+            didNotSettle = true;
             DidNotSettle();
-            Debug.Log(other.name);
         }
 
         if (other.tag != "Product" || other.tag != "Border")
         {
-            if (collided)
+            if (_collided && !didNotSettle)
             {
+                didSettle= true;
                 DidSettle();
-                collided = false;
+                _collided = false;
             }
         }
     }
     void DidSettle()
     {
-        clickable = false;
-        EventManager.DidSettle(Mathf.Floor(volume));
+        if (transform.position!=firstPosition)
+        {
+            _clickable = false;
+            EventManager.DidSettle(Mathf.Floor(volume));
+        }
     }
     void DidNotSettle()
     {
-        transform.position = firstPosition;
-        transform.rotation = firstRotation;
-        clickable = true;
+        if (didNotSettle && !didSettle)
+        {
+            transform.position = firstPosition;
+            transform.rotation = firstRotation;
+            _clickable = true;
+        }
+        if (transform.position==firstPosition)
+        {
+            cliced = false; 
+            doubleSize = false; 
+            didSettle = false; 
+            didNotSettle = false;
+            _collided = true;
+            _clickable = true;
+            Debug.Log("2 "+transform.name);
+        }
     }
 
     void Start()
@@ -91,7 +109,7 @@ public class Products : MonoBehaviour,IClickable
 
     public void OnClick()
     {
-        if (clickable)
+        if (_clickable)
         {
             cliced = true;
             EventManager.ProductHeight(transform.GetComponent<BoxCollider>().size.y);
