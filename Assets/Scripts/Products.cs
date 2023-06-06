@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Products : MonoBehaviour,IClickable
 {
@@ -41,47 +42,28 @@ public class Products : MonoBehaviour,IClickable
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Products>() || other.GetComponent<BorderManager>()) 
+        if (other.GetComponent<Products>() || other.GetComponent<BorderManager>())
         {
-            didNotSettle = true;
             DidNotSettle();
         }
-
-        if (other.tag != "Product" || other.tag != "Border")
+        if (!didNotSettle && other.GetComponent<HamperController>())
         {
-            if (_collided && !didNotSettle)
-            {
-                didSettle= true;
-                DidSettle();
-                _collided = false;
-            }
+            DidSettle();
         }
     }
     void DidSettle()
     {
-        if (transform.position!=firstPosition)
-        {
-            _clickable = false;
-            EventManager.DidSettle(Mathf.Floor(volume));
-        }
+        didSettle = true;
+        _clickable = false;
+        //EventManager.DidSettle(Mathf.Floor(volume));
     }
     void DidNotSettle()
     {
+        didNotSettle = true;
         if (didNotSettle && !didSettle)
         {
             transform.position = firstPosition;
             transform.rotation = firstRotation;
-            _clickable = true;
-        }
-        if (transform.position==firstPosition)
-        {
-            cliced = false; 
-            doubleSize = false; 
-            didSettle = false; 
-            didNotSettle = false;
-            _collided = true;
-            _clickable = true;
-            Debug.Log("2 "+transform.name);
         }
     }
 
@@ -96,7 +78,20 @@ public class Products : MonoBehaviour,IClickable
     
     void Update()
     {
-        
+        //if (didSettle)
+        //{
+        //    didNotSettle = false;
+        //}
+        if (transform.position == firstPosition && didNotSettle)
+        {
+            cliced = false;
+            doubleSize = false;
+            didSettle = false;
+            didNotSettle = false;
+            _collided = true;
+            _clickable = true;
+            Debug.Log("2 " + transform.name);
+        }
     }
 
     void CalculateVolume()
