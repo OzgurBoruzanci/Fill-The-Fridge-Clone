@@ -112,6 +112,10 @@ MonoBehaviour:
   volume: 0
   cliced: 0
   doubleSize: 0
+  didSettle: 0
+  didNotSettle: 0
+  _collided: 1
+  _clickable: 1
 --- !u!54 &6094685899587355301
 Rigidbody:
   m_ObjectHideFlags: 0

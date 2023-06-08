@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 public class Products : MonoBehaviour,IClickable
 {
     public float volume;
+    bool _revokebool;
     public bool cliced = false;
     public bool doubleSize = false;
     public bool didSettle = false;
@@ -18,15 +19,21 @@ public class Products : MonoBehaviour,IClickable
     Quaternion firstRotation;
     private void OnEnable()
     {
+        EventManager.RevokeBool += RevokeBool;
         EventManager.TargetPosition += TargetPosition;
         //EventManager.DidNotSettle += DidNotSettle;
         //EventManager.DidSettle += DidSettle;
     }
     private void OnDisable()
     {
+        EventManager.RevokeBool -= RevokeBool;
         EventManager.TargetPosition -= TargetPosition;
         //EventManager.DidNotSettle -= DidNotSettle;
         //EventManager.DidSettle -= DidSettle;
+    }
+    void RevokeBool(bool revoke)
+    {
+        _revokebool = revoke;
     }
     void TargetPosition(Vector3 targetPosition,Quaternion rotation)
     {
@@ -45,6 +52,10 @@ public class Products : MonoBehaviour,IClickable
         if (other.GetComponent<Products>() || other.GetComponent<BorderManager>())
         {
             DidNotSettle();
+        }
+        if (!doubleSize  || !other.GetComponent<Products>() || !other.GetComponent<BorderManager>())
+        {
+            DidSettle();
         }
         if (!didNotSettle && other.GetComponent<HamperController>())
         {
@@ -90,7 +101,6 @@ public class Products : MonoBehaviour,IClickable
             didNotSettle = false;
             _collided = true;
             _clickable = true;
-            Debug.Log("2 " + transform.name);
         }
     }
 
@@ -104,10 +114,15 @@ public class Products : MonoBehaviour,IClickable
 
     public void OnClick()
     {
-        if (_clickable)
+        if (_clickable && !_revokebool)
         {
             cliced = true;
-            EventManager.ProductHeight(transform.GetComponent<BoxCollider>().size.y);
+            EventManager.ProductHeight(transform.GetComponent<BoxCollider>().size.y,cliced);
+        }
+        else if (_revokebool)
+        {
+            transform.position = firstPosition;
+            transform.rotation=firstRotation;
         }
     }
     void IsDoubleSize()

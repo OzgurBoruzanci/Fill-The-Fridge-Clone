@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManagerController : MonoBehaviour
 {
     public float hamperVolume;
-
+    bool revokeCliced=false;
     private void OnEnable()
     {
         EventManager.HamperVolume += HamperVolume;
@@ -57,6 +57,19 @@ public class GameManagerController : MonoBehaviour
         else
         {
             Debug.Log("****GAME OVER****");
+        }
+    }
+    public void Revoke()
+    {
+        if (!revokeCliced)
+        {
+            revokeCliced = true;
+            EventManager.RevokeBool(revokeCliced);
+        }
+        else if (revokeCliced)
+        {
+            revokeCliced = false;
+            EventManager.RevokeBool(revokeCliced);
         }
     }
 }
