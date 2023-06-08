@@ -8,8 +8,10 @@ using UnityEngine.UIElements;
 public class GripCellManager : MonoBehaviour,IClickable
 {
     Vector3 targetPosition;
+    Vector3 _firstPosition;
     float height;
     public bool isDoubleSize=false;
+    bool _revokeBool=false;
     bool _cliced = false;
     bool _secondRow=false;
     bool _productCliced=false;
@@ -22,11 +24,21 @@ public class GripCellManager : MonoBehaviour,IClickable
 
     private void OnEnable()
     {
+        EventManager.RevokeBool += RevokeBool;
         EventManager.ProductHeight += ProductHeight;
     }
     private void OnDisable()
     {
+        EventManager.RevokeBool -= RevokeBool;
         EventManager.ProductHeight -= ProductHeight;
+    }
+    void RevokeBool(bool revokeBool)
+    {
+        _revokeBool = revokeBool;
+        if (_revokeBool)
+        {
+            transform.position = _firstPosition;
+        }
     }
     void ProductHeight(float productHeight,bool productCliced)
     {
@@ -44,29 +56,33 @@ public class GripCellManager : MonoBehaviour,IClickable
 
     void TargetPosition()
     {
-        if (isDoubleSize && !_secondRow)
+        if (!_revokeBool && _productCliced)
         {
-            targetPosition = transform.GetChild(0).position;
-        }
-        else
-        {
-            targetPosition = transform.GetChild(1).position;
-            _secondRow = true;
-        }
-
-        if (_cliced && !isDoubleSize && _productCliced)
-        {
-            GripCellPositionControl(1.001f);
-
-            if (transform.localPosition.y > 2.001f)
+            if (isDoubleSize && !_secondRow)
             {
-                GripCellPositionControl(-1.002f);
+                targetPosition = transform.GetChild(0).position;
+            }
+            else
+            {
+                targetPosition = transform.GetChild(1).position;
+                _secondRow = true;
+            }
+
+            if (_cliced && !isDoubleSize)
+            {
+                GripCellPositionControl(1.001f);
+
+                if (transform.localPosition.y > 2.001f)
+                {
+                    GripCellPositionControl(-1.002f);
+                }
             }
         }
     }
     void Start()
     {
         targetPosition= transform.position;
+        _firstPosition = transform.position;
     }
 
     void GripCellPositionControl(float distance)

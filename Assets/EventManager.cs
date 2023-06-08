@@ -11,4 +11,5 @@ public static class EventManager
     public static Action<float> HamperVolume;
     public static Action<float> DidSettle;
     public static Action<bool> RevokeBool;
+    public static Action<float> RevokeVolume;
 }

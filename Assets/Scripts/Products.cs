@@ -10,7 +10,6 @@ public class Products : MonoBehaviour,IClickable
     public float volume;
     bool _revokebool;
     public bool cliced = false;
-    public bool doubleSize = false;
     public bool didSettle = false;
     public bool didNotSettle=false;
     public bool _collided=true;
@@ -41,6 +40,7 @@ public class Products : MonoBehaviour,IClickable
         {
             transform.rotation = rotation;
             transform.position = targetPosition;
+            EventManager.DidSettle(Mathf.Floor(volume));
             //transform.DORotateQuaternion(rotation, 0.01f);
             //transform.DOMove(targetPosition, 0.5f);
             cliced = false;
@@ -49,15 +49,12 @@ public class Products : MonoBehaviour,IClickable
     }
     private void OnTriggerEnter(Collider other)
     {
+        
         if (other.GetComponent<Products>() || other.GetComponent<BorderManager>())
         {
             DidNotSettle();
         }
-        if (!doubleSize  || !other.GetComponent<Products>() || !other.GetComponent<BorderManager>())
-        {
-            DidSettle();
-        }
-        if (!didNotSettle && other.GetComponent<HamperController>())
+        if (!didNotSettle && !other.GetComponent<Products>() && !other.GetComponent<BorderManager>())
         {
             DidSettle();
         }
@@ -66,7 +63,6 @@ public class Products : MonoBehaviour,IClickable
     {
         didSettle = true;
         _clickable = false;
-        //EventManager.DidSettle(Mathf.Floor(volume));
     }
     void DidNotSettle()
     {
@@ -81,26 +77,15 @@ public class Products : MonoBehaviour,IClickable
     void Start()
     {
         CalculateVolume();
-        IsDoubleSize();
         firstPosition=transform.position;
         firstRotation = transform.rotation;
     }
-
-    
-    void Update()
+    private void Update()
     {
-        //if (didSettle)
-        //{
-        //    didNotSettle = false;
-        //}
-        if (transform.position == firstPosition && didNotSettle)
+        if (transform.position==firstPosition && didNotSettle)
         {
-            cliced = false;
-            doubleSize = false;
-            didSettle = false;
-            didNotSettle = false;
-            _collided = true;
-            _clickable = true;
+            InitialValues();
+            EventManager.RevokeVolume(Mathf.Floor(volume));
         }
     }
 
@@ -123,13 +108,18 @@ public class Products : MonoBehaviour,IClickable
         {
             transform.position = firstPosition;
             transform.rotation=firstRotation;
+            //InitialValues();
+            EventManager.RevokeVolume(Mathf.Floor(volume));
         }
     }
-    void IsDoubleSize()
+ 
+
+    void InitialValues()
     {
-        if (transform.GetComponent<BoxCollider>().size.y>1)
-        {
-            doubleSize= true;
-        }
+        cliced = false;
+        didSettle = false;
+        didNotSettle = false;
+        _collided = true;
+        _clickable = true;
     }
 }

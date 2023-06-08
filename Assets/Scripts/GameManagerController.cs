@@ -5,24 +5,32 @@ using UnityEngine;
 public class GameManagerController : MonoBehaviour
 {
     public float hamperVolume;
-    bool revokeCliced=false;
+    
     private void OnEnable()
     {
         EventManager.HamperVolume += HamperVolume;
         EventManager.DidSettle += DidSettle;
+        EventManager.RevokeVolume += RevokeVolume;
     }
     private void OnDisable()
     {
         EventManager.HamperVolume -= HamperVolume;
         EventManager.DidSettle -= DidSettle;
+        EventManager.RevokeVolume -= RevokeVolume;
     }
     void HamperVolume(float hVolume)
     {
         hamperVolume=hVolume;
+        Debug.Log(hamperVolume + " gelen= " + hVolume);
     }
     void DidSettle(float didSettle) 
     {
         hamperVolume -= didSettle;
+        Debug.Log(didSettle);
+    }
+    void RevokeVolume(float revokeVolume)
+    {
+        hamperVolume += revokeVolume;
     }
 
     void Update()
@@ -59,17 +67,5 @@ public class GameManagerController : MonoBehaviour
             Debug.Log("****GAME OVER****");
         }
     }
-    public void Revoke()
-    {
-        if (!revokeCliced)
-        {
-            revokeCliced = true;
-            EventManager.RevokeBool(revokeCliced);
-        }
-        else if (revokeCliced)
-        {
-            revokeCliced = false;
-            EventManager.RevokeBool(revokeCliced);
-        }
-    }
+    
 }
