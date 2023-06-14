@@ -49,12 +49,15 @@ public class Products : MonoBehaviour,IClickable
     }
     private void OnTriggerEnter(Collider other)
     {
-        
         if (other.GetComponent<Products>() || other.GetComponent<BorderManager>())
         {
             DidNotSettle();
         }
-        if (!didNotSettle && !other.GetComponent<Products>() && !other.GetComponent<BorderManager>())
+        if (!didNotSettle && volume<=1 && !other.GetComponent<Products>() && !other.GetComponent<BorderManager>())
+        {
+            DidSettle();
+        }
+        if (!didNotSettle && other.GetComponent<HamperController>())
         {
             DidSettle();
         }
@@ -67,7 +70,7 @@ public class Products : MonoBehaviour,IClickable
     void DidNotSettle()
     {
         didNotSettle = true;
-        if (didNotSettle && !didSettle)
+        if (didNotSettle && !didSettle && _clickable)
         {
             transform.position = firstPosition;
             transform.rotation = firstRotation;
@@ -108,7 +111,7 @@ public class Products : MonoBehaviour,IClickable
         {
             transform.position = firstPosition;
             transform.rotation=firstRotation;
-            //InitialValues();
+            InitialValues();
             EventManager.RevokeVolume(Mathf.Floor(volume));
         }
     }

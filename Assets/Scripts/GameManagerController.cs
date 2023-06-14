@@ -5,29 +5,31 @@ using UnityEngine;
 public class GameManagerController : MonoBehaviour
 {
     public float hamperVolume;
-    
+    bool _revokeBool;
     private void OnEnable()
     {
         EventManager.HamperVolume += HamperVolume;
         EventManager.DidSettle += DidSettle;
         EventManager.RevokeVolume += RevokeVolume;
+        EventManager.RevokeBool += RevokeBool;
     }
     private void OnDisable()
     {
         EventManager.HamperVolume -= HamperVolume;
         EventManager.DidSettle -= DidSettle;
         EventManager.RevokeVolume -= RevokeVolume;
+        EventManager.RevokeBool -= RevokeBool;
+    }
+    void RevokeBool(bool revokeBool)
+    {
+        _revokeBool = revokeBool;
     }
     void HamperVolume(float hVolume)
     {
-        hamperVolume=hVolume;
-        Debug.Log(hamperVolume + " gelen= " + hVolume);
-    }
+        hamperVolume=hVolume;    }
     void DidSettle(float didSettle) 
     {
-        hamperVolume -= didSettle;
-        Debug.Log(didSettle);
-    }
+        hamperVolume -= didSettle;    }
     void RevokeVolume(float revokeVolume)
     {
         hamperVolume += revokeVolume;
@@ -58,13 +60,20 @@ public class GameManagerController : MonoBehaviour
 
     void IsItHealthy()
     {
-        if (hamperVolume>=0)
+        if (!_revokeBool)
         {
-            MouseDown();
+            if (hamperVolume > 0)
+            {
+                MouseDown();
+            }
+            else
+            {
+                Debug.Log("****GAME END****");
+            }
         }
         else
         {
-            Debug.Log("****GAME OVER****");
+            MouseDown();
         }
     }
     
